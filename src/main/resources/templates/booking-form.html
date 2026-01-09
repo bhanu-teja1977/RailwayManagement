@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Train - Railway Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/"><i class="bi bi-train-front"></i> Railway Management</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" th:href="@{/dashboard}">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/trains}">Trains</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/user/bookings}">My Bookings</a></li>
+                    <li class="nav-item">
+                        <form th:action="@{/logout}" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-link nav-link">Logout</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <h1 class="mb-4"><i class="bi bi-ticket"></i> Book Train</h1>
+
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Train Details</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Train Number:</strong> <span th:text="${train.trainNumber}">12345</span></p>
+                                <p><strong>Train Name:</strong> <span th:text="${train.name}">Express</span></p>
+                                <p><strong>Route:</strong> 
+                                    <span th:text="${train.source}">Source</span> 
+                                    <i class="bi bi-arrow-right"></i> 
+                                    <span th:text="${train.destination}">Destination</span>
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Departure:</strong> <span th:text="${#temporals.format(train.departureTime, 'dd-MM-yyyy HH:mm')}">01-01-2025 10:00</span></p>
+                                <p><strong>Arrival:</strong> <span th:text="${#temporals.format(train.arrivalTime, 'dd-MM-yyyy HH:mm')}">01-01-2025 18:00</span></p>
+                                <p><strong>Seats Available:</strong> <span class="badge bg-success" th:text="${train.seatsAvailable}">50</span></p>
+                                <p><strong>Fare per Seat:</strong> ₹<span th:text="${#numbers.formatDecimal(train.fare, 1, 2)}">1000.00</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">Booking Details</h5>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/user/bookings/book/{id}(id=${train.id})}" method="post">
+                            <div class="mb-3">
+                                <label for="seatsBooked" class="form-label">Number of Seats</label>
+                                <input type="number" class="form-control" id="seatsBooked" name="seatsBooked" 
+                                       min="1" th:max="${train.seatsAvailable}" value="1" required
+                                       oninput="calculateTotal()">
+                                <small class="text-muted">Maximum <span th:text="${train.seatsAvailable}">50</span> seats available</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Total Fare</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">₹</span>
+                                    <input type="text" class="form-control" id="totalFare" readonly>
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-success btn-lg">
+                                    <i class="bi bi-check-circle"></i> Confirm Booking
+                                </button>
+                                <a th:href="@{/trains}" class="btn btn-secondary">
+                                    <i class="bi bi-arrow-left"></i> Back to Trains
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-info-circle"></i> Booking Information</h5>
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Instant confirmation</li>
+                            <li class="mb-2"><i class="bi bi-shield-check text-success"></i> Secure payment</li>
+                            <li class="mb-2"><i class="bi bi-ticket-perforated text-success"></i> E-ticket via email</li>
+                            <li class="mb-2"><i class="bi bi-clock text-success"></i> 24/7 customer support</li>
+                        </ul>
+                        <hr>
+                        <h6>Cancellation Policy</h6>
+                        <p class="small text-muted">
+                            Bookings can be cancelled before the train departure time. 
+                            Refunds will be processed within 5-7 business days.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="mt-5 py-4 bg-light">
+        <div class="container text-center">
+            <p class="mb-0">&copy; 2025 Railway Management System. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:inline="javascript">
+        const farePerSeat = /*[[${train.fare}]]*/ 1000;
+        
+        function calculateTotal() {
+            const seats = document.getElementById('seatsBooked').value;
+            const total = seats * farePerSeat;
+            document.getElementById('totalFare').value = total.toFixed(2);
+        }
+        
+        // Calculate initial total
+        calculateTotal();
+    </script>
+</body>
+</html>
