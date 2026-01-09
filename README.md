@@ -326,27 +326,3 @@ mvn test
 3. Commit your changes
 4. Push to the branch
 5. Create a Pull Request
-
-## License
-
-This project is created for educational purposes.
-
-## Support
-
-For issues and questions:
-- Email: support@railway.com
-- Phone: 1800-XXX-XXXX
-
-## Authors
-
-- Railway Management Team
-
-## Acknowledgments
-
-- Spring Boot Team
-- Thymeleaf Team
-- Bootstrap Team
-
----
-
-**Note:** This is a demo application. For production use, implement additional security measures, proper payment gateway integration, and comprehensive testing.
